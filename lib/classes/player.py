@@ -15,16 +15,26 @@ class Player:
             raise ValueError('username must be between 2 and 16 chars')
     
     def games_played(self):
-        # we'll go over this again on Tue
         games = []
         for result in self.results:
-            games.append(result.game)
+           games.append(result.game)
         return games
     
     def has_played_game(self, game):
-        # we'll go over this again on Tue
+        # loop through results
+        # for result in self.results:
+        #     if result.game == game:  # we found our target
+        #         return True  # stop processing
+        # return False  # can only do this once we leave the loop
         return game in self.games_played()
     
     def num_times_played(self, game):
-        pass
+        count = 0
+        for result in self.results:
+            if result.game == game:
+                count += 1
+        return count
+
+    def __repr__(self) -> str:
+        return f"<Player {self.username}>"
 

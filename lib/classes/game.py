@@ -15,7 +15,26 @@ class Game:
             self._title = new_title
     
     def get_players(self):
-        pass
+        players = []
+        for result in self.results:
+            players.append(result.player)
+        return players
     
+    # def average_score(self):
+    #     total = 0
+    #     for result in self.results:
+    #         total += result.score
+    #     return total / len(self.results)
+
     def average_score(self, player):
-        pass
+        total = 0
+        count = 0
+        for result in self.results:
+            if result.player == player:
+                total += result.score
+                count += 1
+        return total / count
+
+
+    def __repr__(self) -> str:
+        return f"<Game {self.title}>"

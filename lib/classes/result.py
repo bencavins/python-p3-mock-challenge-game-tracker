@@ -24,7 +24,10 @@ class Result:
     @player.setter
     def player(self, new_player):
         from classes.player import Player
-        if (new_player, Player):
+        if isinstance(new_player, Player):
             self._player = new_player
         else:
             raise ValueError('player must be of type Player')
+    
+    def __repr__(self) -> str:
+        return f'<Result {self.game} {self.player} {self.score}'
