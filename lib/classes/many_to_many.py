@@ -22,15 +22,30 @@ class Game:
         
         self._title = new_title
         
-
     def results(self):
-        pass
+        result_list = []
+        for result in Result.all:
+            if result.game is self:
+                result_list.append(result)
+        return result_list
 
     def players(self):
-        pass
+        player_list = []
+        for result in self.results():
+            player_list.append(result.player)
+        return list(set(player_list))
 
     def average_score(self, player):
-        pass
+        total = 0
+        count = 0
+        for result in self.results():
+            if result.player is player:
+                total += result.score
+                count += 1
+        return total / count
+
+    def __repr__(self) -> str:
+        return f'<Game {self.title}>'
 
 class Player:
     def __init__(self, username):
@@ -58,13 +73,41 @@ class Player:
         # return [result_obj for result_obj in Result.all if result_obj.player is self]
 
     def games_played(self):
-        pass
+        games = []
+        for result in self.results():
+            games.append(result.game)
+        return list(set(games))
 
     def played_game(self, game):
-        pass
+        return game in self.games_played()
 
     def num_times_played(self, game):
-        pass
+        count = 0
+        for result in self.results():
+            if result.game is game:
+                count += 1
+        return count
+    
+    @classmethod
+    def highest_scored(cls, game):
+        players = game.players()
+
+        if len(players) == 0:
+            return None
+
+        max_player = players[0]
+        max_player_avg = game.average_score(max_player)
+
+        for player in players:
+            avg = game.average_score(player)
+            if avg > max_player_avg:
+                max_player = player
+                max_player_avg = avg
+        return max_player
+        # return max(players, key=lambda player: game.average_score(player))
+
+    def __repr__(self) -> str:
+        return f'<Player {self.username}>'
 
 class Result:
     all = []
@@ -122,11 +165,16 @@ class Result:
 
 
 g1 = Game('pacman')
+g2 = Game('galaga')
 
 p1 = Player('bob123')
 p2 = Player('anne567')
 
 r1 = Result(p1, g1, 3000)
 r2 = Result(p2, g1, 4000)
+r3 = Result(p2, g1, 500)
+r4 = Result(p2, g2, 800)
 
-print(p2.results())
+print(g1.average_score(p1))
+print(g1.average_score(p2))
+print(Player.highest_scored(g1))
