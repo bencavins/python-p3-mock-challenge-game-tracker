@@ -16,13 +16,33 @@ class Game:
         #     raise ValueError()
 
     def results(self):
-        pass
+        result_objs = []
+        for r in Result.all:
+            if r.game is self:
+                result_objs.append(r)
+        return result_objs
+        # [(thing to append) (for loop def) (conditional statement)]
+        # return [r for r in Result.all if r.game is self]
 
     def players(self):
-        pass
+        players_set = set()
+        for r in self.results():
+            players_set.add(r.player)
+        return players_set
+        # return set([r.player for r in self.results()])
 
     def average_score(self, player):
-        pass
+        total = 0
+        count = 0
+        for r in self.results():
+            if r.player is player:
+                total += r.score
+                count += 1
+
+        if count == 0:
+            return None
+        
+        return total / count
 
     def __repr__(self) -> str:
         return f'<Game {self.title}>'
@@ -42,28 +62,61 @@ class Player:
             self._username = new_username
 
     def results(self):
-        pass
+        result_objs = []
+        for r in Result.all:
+            if r.player is self:
+                result_objs.append(r)
+        return result_objs
+        # return [r for r in Result.all if r.player is self]
 
     def games_played(self):
-        pass
+        games = set()
+        for r in self.results():
+            games.add(r.game)
+        return games
+        # return set([r.game for r in self.results()])
 
     def played_game(self, game):
-        pass
+        return game in self.games_played()
 
     def num_times_played(self, game):
-        pass
+        count = 0
+        for r in self.results():
+            if r.game is game:
+                count += 1
+        return count
+        # return [r.game for r in self.results()].count(game)
+
+    @classmethod
+    def highest_scored(cls, game):
+        players = list(game.players())
+
+        # all the players who played this game
+        max_player = players[0]
+        max_player_avg = game.average_score(players[0])
+
+        for player in players:
+            # the avg score for the players who played this game
+            avg = game.average_score(player)
+            if avg > max_player_avg:
+                max_player_avg = avg
+                max_player = player
+        
+        return max_player, max_player_avg
+        # return max(players, key=lambda player: game.average_score(player))
+
 
     def __repr__(self) -> str:
         return f'<Player {self.username}>'
 
 class Result:
-    # all = []
+    all = []
 
     def __init__(self, player, game, score):
         self.player = player
         self.game = game
         self.score = score
-        # Result.all.append(self)
+        Result.all.append(self)
     
     @property
     def score(self):
@@ -100,11 +153,15 @@ class Result:
 
 if __name__ == '__main__':  # only run this code if this file is executed directly
     g1 = Game('pacman')
+    g2 = Game('donkey kong')
 
     p1 = Player('bob123')
+    p2 = Player('anon')
 
     r1 = Result(p1, g1, 5000)
+    r1 = Result(p1, g1, 4000)
+    r1 = Result(p1, g1, 3000)
+    r1 = Result(p1, g2, 123)
+    r1 = Result(p2, g1, 999)
     
-    print(g1)
-    print(p1)
-    print(r1)
+    print(Player.highest_scored(g1))
