@@ -21,18 +21,54 @@ class Game:
             self._title = new_title
 
     def results(self):
-        pass
+        game_results = []
+        for result in Result.all:
+            if result.game is self:
+                game_results.append(result)
+        return game_results
+        # return [result for result in Result.all if result.game is self]
 
     def players(self):
-        pass
+        players_list = []
+        for result in self.results():
+            players_list.append(result.player)
+        return list(set(players_list))
+        # return list(set([result.player for result in self.results()]))
 
     def average_score(self, player):
-        pass
+        total = 0
+        count = 0
+        for result in self.results():
+            if result.player is player:
+                total += result.score
+                count += 1
+        return total / count
+
+    def all_player_avgs(self):
+        avgs = {}
+        for player in self.players():
+            avg = self.average_score(player)
+            avgs[player] = avg
+        return avgs
 
     def __repr__(self):
         return f'<Game {self.title}>'
 
 class Player:
+
+    @classmethod
+    def highest_scored(cls, game):
+        avgs = game.all_player_avgs()
+        max_player = None
+        max_score = -1
+        for player in avgs:
+            score = avgs[player]
+            if score > max_score:
+                max_score = score
+                max_player = player
+        return max_player, max_score
+        # return max([(player, score) for player, score in game.all_player_avgs().items()], key=lambda x: x[1])
+
     def __init__(self, username):
         self.username = username
 
@@ -50,16 +86,31 @@ class Player:
             self._username = new_username
 
     def results(self):
-        pass
+        player_results = []
+        for result in Result.all:
+            if result.player is self:
+                player_results.append(result)
+        return player_results
+        # [(thing to append) (for loop definition) (optional if condition)]
+        # return [result for result in Result.all if result.player is self]
 
     def games_played(self):
-        pass
+        games = []
+        for result in self.results():
+            games.append(result.game)
+        return list(set(games))
+        # return list(set([result.game for result in self.results()]))
 
     def played_game(self, game):
-        pass
+        return game in self.games_played()
 
     def num_times_played(self, game):
-        pass
+        count = 0
+        for result in self.results():
+            if result.game is game:
+                count += 1
+        return count
+        # return sum([1 for result in self.results() if result.game is game])
 
     def __repr__(self):
         return f'<Player {self.username}>'
